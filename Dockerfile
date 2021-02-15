@@ -57,16 +57,6 @@ WORKDIR $HOME
 
 # environment setup
 RUN mkdir -p $HOME/catkin_ws/src
-RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> $HOME/.bashrc 
-RUN echo "source $HOME/catkin_ws/devel/setup.bash" >> $HOME/.bashrc 
-RUN echo $'if ! shopt -oq posix; then \n\
-  if [ -f /usr/share/bash-completion/bash_completion ]; then \n\
-    . /usr/share/bash-completion/bash_completion \n\
-  elif [ -f /etc/bash_completion ]; then \n\
-    . /etc/bash_completion \n\
-  fi \n\
-fi ' >>  $HOME/.bashrc 
-
 
 # setup workspace
 WORKDIR "$HOME/catkin_ws"
@@ -115,9 +105,22 @@ RUN sudo apt-get install -y python-dev python-opencv python-wxgtk4.0 python-pip 
 RUN cd $HOME/catkin_ws/src \
 && git clone https://github.com/ArduPilot/ardupilot.git \
 && cd ardupilot && git submodule update --init --recursive \
-&& ./waf configure --board sitl && ./waf sub \ 
+&& ./waf configure --board sitl && ./waf sub 
+
+RUN cd $HOME/catkin_ws/src/ardupilot \
 && ./Tools/environment_install/install-prereqs-ubuntu.sh -y \
-&& source ~/.profile \
+&& source ~/.profile
+
+# SOURCING
+RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> $HOME/.bashrc 
+RUN echo "source $HOME/catkin_ws/devel/setup.bash" >> $HOME/.bashrc 
+RUN echo $'if ! shopt -oq posix; then \n\
+  if [ -f /usr/share/bash-completion/bash_completion ]; then \n\
+    . /usr/share/bash-completion/bash_completion \n\
+  elif [ -f /etc/bash_completion ]; then \n\
+    . /etc/bash_completion \n\
+  fi \n\
+fi ' >>  $HOME/.bashrc 
 
 
 # setup entrypoint
