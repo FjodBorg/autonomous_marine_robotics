@@ -12,5 +12,5 @@ echo "Directory of called script: $DIR"
 echo "Name of container: $container_name"
 
 xhost +local:"docker inspect --format='{{ .Config.Hostname }}' $container_name" 
-docker start $container_name
-docker exec -it $container_name bash
+docker start $container_name 
+docker exec --user docker -it $container_name bash
