@@ -118,7 +118,6 @@ RUN cd $HOME/catkin_ws/src \
 && ./waf configure --board sitl && ./waf sub \ 
 && ./Tools/environment_install/install-prereqs-ubuntu.sh -y \
 && source ~/.profile \
-&& ./waf clean 
 
 
 # setup entrypoint
