@@ -12,8 +12,11 @@ repo_DIR=$(dirname "$DIR")
 echo "Directory of called script: $DIR"
 echo "Name of container: $container_name"
 
-docker build --build-arg DISPLAY=${DISPLAY} -t $container_name $repo_DIR/. && 
+
+docker build -t $container_name $repo_DIR/. && 
+	# ${DISPLAY} Returns newline, find fix
+#docker build --build-arg DISPLAY=${DISPLAY} -t $container_name $repo_DIR/. && 
 #docker build --build-arg HOME=${HOME} --build-arg repo_DIR="/${repo_DIR}" -t $container_name $repo_DIR/.
-docker run -it -d --net=host --name=$container_name -v $HOME/repos/$container_name/src/:"/home/docker/catkin_ws/src_extern/" $container_name bash
-#docker run -it -d --net=host --env="DISPLAY" --env="QT_X11_NO_MITSHM=1" --name=$container_name -v $HOME/repos/$container_name/src/:"/home/docker/catkin_ws/src_extern/" $container_name bash
+#docker run -it -d --net=host --name=$container_name -v $HOME/repos/$container_name/src/:"/home/docker/catkin_ws/src_extern/" $container_name bash
+docker run -it -d --net=host --env="DISPLAY" --name=$container_name -v $HOME/repos/$container_name/src/:"/home/docker/catkin_ws/src_extern/" $container_name bash
 
