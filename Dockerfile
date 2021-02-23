@@ -26,6 +26,7 @@ ENV LC_ALL C.UTF-8
 ENV ROS_DISTRO melodic
 
 
+
 # install ros-desktop-full and ros packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-melodic-desktop-full curl iputils-ping git openssh-server \ 
@@ -53,6 +54,13 @@ ARG DISPLAY=":0"
 ENV HOME=/home/$USER
 ENV DISPLAY=$DISPLAY
 ENV QT_X11_NO_MITSHM=1
+
+# with nvidia/cuda drivers
+ENV NVIDIA_VISIBLE_DEVICES \
+    ${NVIDIA_VISIBLE_DEVICES:-all}
+ENV NVIDIA_DRIVER_CAPABILITIES \
+    ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
+    
 WORKDIR $HOME
 
 # environment setup
