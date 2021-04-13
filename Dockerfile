@@ -55,12 +55,6 @@ ENV HOME=/home/$USER
 ENV DISPLAY=$DISPLAY
 ENV QT_X11_NO_MITSHM=1
 
-# with nvidia/cuda drivers
-ENV NVIDIA_VISIBLE_DEVICES \
-    ${NVIDIA_VISIBLE_DEVICES:-all}
-ENV NVIDIA_DRIVER_CAPABILITIES \
-    ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
-    
 WORKDIR $HOME
 
 # environment setup
@@ -75,7 +69,7 @@ RUN sudo apt-get install -y bash-completion gedit
 
 # install blue_rov_things
 RUN cd $HOME/catkin_ws/src && git clone https://github.com/tu-darmstadt-ros-pkg/hector_localization \
-&& git clone https://github.com/ros-teleop/teleop_tools \
+&& git clone -b kinetic-devel https://github.com/ros-teleop/teleop_tools \
 && git clone https://github.com/FletcherFT/bluerov2.git
 
 RUN sudo apt install -y ros-melodic-uuv-simulator ros-melodic-gazebo-* ros-melodic-geographic-msgs geographiclib-tools
@@ -83,12 +77,27 @@ RUN sudo apt-get install -y python-catkin-tools python-rosinstall-generator pyth
 
 RUN source /opt/ros/melodic/setup.sh && sudo rosdep init && rosdep update --as-root apt:false
 
-RUN source /opt/ros/melodic/setup.sh && cd $HOME/catkin_ws && catkin init && wstool init src \
+RUN source /opt/ros/$ROS_DISTRO/setup.sh && cd $HOME/catkin_ws && catkin init && wstool init src \
 && rosinstall_generator --rosdistro $ROS_DISTRO mavlink | tee /tmp/mavros.rosinstall \
 && rosinstall_generator --upstream mavros | tee -a /tmp/mavros.rosinstall \
 && wstool merge -t src /tmp/mavros.rosinstall && wstool update -t src -j4 
 
-RUN source /opt/ros/melodic/setup.sh && cd $HOME/catkin_ws  && rosdep install --from-paths src --ignore-src -y \
+
+RUN sudo apt install ros-$ROS_DISTRO-ros-base ros-$ROS_DISTRO-rosbash --reinstall
+RUN sudo apt install openjdk-11-jdk  -y 
+RUN mkdir $HOME/repos/ && cd $HOME/repos/ \
+&& git clone https://github.com/LSTS/neptus.git \
+&& cd neptus \
+&& git checkout 38c7f41a9885c6b059f79b38861edb4b7b67511b \
+./gradlew
+RUN cd $HOME/catkin_ws/src/bluerov2 && cp neptus_playground/vehicle-defs/00-bluerov2-1.nvcl $HOME/repos/neptus/vehicles-defs/. 
+
+RUN sudo apt install python-pip -y && python -m pip install future
+RUN sudo apt install libxml2-dev libxslt-dev python-dev python-lxml libgeographic-dev ros-$ROS_DISTRO-geographic-msgs -y 
+RUN cd $HOME/catkin_ws/src && git clone -b noetic-devel https://github.com/FletcherFT/imc_ros_bridge.git 
+RUN cd $HOME/catkin_ws && source /opt/ros/$ROS_DISTRO/setup.sh && catkin build
+
+RUN source /opt/ros/$ROS_DISTRO/setup.sh && cd $HOME/catkin_ws  && rosdep install --from-paths src --ignore-src -y \
 && sudo ./src/mavros/mavros/scripts/install_geographiclib_datasets.sh \
 && catkin build
 
@@ -131,6 +140,12 @@ RUN echo $'if ! shopt -oq posix; then \n\
 fi ' >>  $HOME/.bashrc 
 
 
+# with nvidia/cuda drivers
+ENV NVIDIA_VISIBLE_DEVICES \
+    ${NVIDIA_VISIBLE_DEVICES:-all}
+ENV NVIDIA_DRIVER_CAPABILITIES \
+    ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
+    
 # setup entrypoint
 COPY "./entrypoint_setup.sh" /
 
