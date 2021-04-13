@@ -84,8 +84,10 @@ RUN source /opt/ros/$ROS_DISTRO/setup.sh && cd $HOME/catkin_ws && catkin init &&
 
 
 RUN sudo apt install ros-$ROS_DISTRO-ros-base ros-$ROS_DISTRO-rosbash --reinstall
+RUN sudo apt remove jre -y
 RUN sudo apt install openjdk-11-jdk  -y 
 RUN mkdir $HOME/repos/ && cd $HOME/repos/ \
+&& source $HOME/.bashrc \
 && git clone https://github.com/LSTS/neptus.git \
 && cd neptus \
 && git checkout 38c7f41a9885c6b059f79b38861edb4b7b67511b \
@@ -139,6 +141,12 @@ RUN echo $'if ! shopt -oq posix; then \n\
   fi \n\
 fi ' >>  $HOME/.bashrc 
 
+RUN sudo apt install ros-melodic-geodesy psmisc -y 
+
+RUN cd $HOME/repos/neptus/ && source $HOME/.bashrc && ./gradlew
+RUN pip install casadi scipy
+
+RUN python -m pip install --upgrade pip && python -m pip install --upgrade setuptools && python -m pip install scipy --force-reinstall
 
 # with nvidia/cuda drivers
 ENV NVIDIA_VISIBLE_DEVICES \
