@@ -28,11 +28,12 @@ docker build -t $container_name $repo_DIR/. &&
 
 VGA_string=$(lspci | grep -i -e "VGA")
 Intel=$(echo $VGA_string | grep Intel)
+echo $Intel
 if [ -z "$Intel" ]
 then
-# with Intel graphics
-      docker run -it -d --net=host --privileged -v /dev/input:/dev/input --env="DISPLAY" --env="QT_X11_NO_MITSHM=1" --name=$container_name -v $HOME/repos/$container_name/src/:"/home/docker/catkin_ws/src_extern/" $container_name bash
-else
 # with nvidia graphics
-	docker run -it -d --net=host --privileged -v /dev/input:/dev/input --env="DISPLAY" --env="QT_X11_NO_MITSHM=1" --name=$container_name -v $HOME/repos/$container_name/src/:"/home/docker/catkin_ws/src_extern/" --gpus all $container_name bash
+      docker run -it -d --net=host --privileged -v /dev/input:/dev/input --env="DISPLAY" --env="QT_X11_NO_MITSHM=1" --name=$container_name -v $HOME/repos/$container_name/src/:"/home/docker/catkin_ws/src_extern/" --gpus all $container_name bash
+else
+# with intel graphics
+	docker run -it -d --net=host --privileged -v /dev/input:/dev/input --env="DISPLAY" --env="QT_X11_NO_MITSHM=1" --name=$container_name -v $HOME/repos/$container_name/src/:"/home/docker/catkin_ws/src_extern/" $container_name bash
 fi
