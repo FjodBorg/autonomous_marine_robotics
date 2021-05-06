@@ -19,10 +19,20 @@ docker build -t $container_name $repo_DIR/. &&
 #docker build --build-arg HOME=${HOME} --build-arg repo_DIR="/${repo_DIR}" -t $container_name $repo_DIR/.
 #docker run -it -d --net=host --name=$container_name -v $HOME/repos/$container_name/src/:"/home/docker/catkin_ws/src_extern/" $container_name bash
 #docker run -it -d --net=host --env="DISPLAY" --env="QT_X11_NO_MITSHM=1" --name=$container_name -v $HOME/repos/$container_name/src/:"/home/docker/catkin_ws/src_extern/" $container_name bash
-docker run -it -d --net=host --privileged -v /dev/input:/dev/input --env="DISPLAY" --env="QT_X11_NO_MITSHM=1" --name=$container_name -v $HOME/repos/$container_name/src/:"/home/docker/catkin_ws/src_extern/" --gpus all $container_name bash
 
 ##-v="/tmp/.X11-unix:/tmp/.X11-unix:rw" --privileged
 
 #export LD_LIBRARY_PATH="/usr/lib/nvidia":${LD_LIBRARY_PATH}
 #export PATH="/usr/lib/nvidia/xorg":${PATH}
 #yay -S nvidia-container-toolkit 
+
+VGA_string=$(lspci | grep -i -e "VGA")
+Intel=$(echo $VGA_string | grep Intel)
+if [ -z "$Intel" ]
+then
+# with Intel graphics
+      docker run -it -d --net=host --privileged -v /dev/input:/dev/input --env="DISPLAY" --env="QT_X11_NO_MITSHM=1" --name=$container_name -v $HOME/repos/$container_name/src/:"/home/docker/catkin_ws/src_extern/" $container_name bash
+else
+# with nvidia graphics
+	docker run -it -d --net=host --privileged -v /dev/input:/dev/input --env="DISPLAY" --env="QT_X11_NO_MITSHM=1" --name=$container_name -v $HOME/repos/$container_name/src/:"/home/docker/catkin_ws/src_extern/" --gpus all $container_name bash
+fi
