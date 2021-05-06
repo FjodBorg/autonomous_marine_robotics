@@ -92,7 +92,7 @@ RUN mkdir $HOME/repos/ && cd $HOME/repos/ \
 && cd neptus \
 && git checkout 38c7f41a9885c6b059f79b38861edb4b7b67511b \
 ./gradlew
-RUN cd $HOME/catkin_ws/src/bluerov2 && cp neptus_playground/vehicle-defs/00-bluerov2-1.nvcl $HOME/repos/neptus/vehicles-defs/. 
+RUN cd $HOME/catkin_ws/src/bluerov2 && cp bluerov2_neptus/vehicle-defs/00-bluerov2-1.nvcl $HOME/repos/neptus/vehicles-defs/. 
 
 RUN sudo apt install python-pip -y && python -m pip install future
 RUN sudo apt install libxml2-dev libxslt-dev python-dev python-lxml libgeographic-dev ros-$ROS_DISTRO-geographic-msgs -y 
