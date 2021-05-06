@@ -97,7 +97,13 @@ RUN cd $HOME/catkin_ws/src/bluerov2 && cp bluerov2_neptus/vehicle-defs/00-bluero
 RUN sudo apt install python-pip -y && python -m pip install future
 RUN sudo apt install libxml2-dev libxslt-dev python-dev python-lxml libgeographic-dev ros-$ROS_DISTRO-geographic-msgs -y 
 RUN cd $HOME/catkin_ws/src && git clone -b noetic-devel https://github.com/FletcherFT/imc_ros_bridge.git 
+
+RUN sudo apt install -y ros-melodic-geographic-info ros-melodic-mavros ros-melodic-robot-localization
+
+RUN cd $HOME/catkin_ws && source /opt/ros/$ROS_DISTRO/setup.sh && catkin build bluerov2_state_estimation
+
 RUN cd $HOME/catkin_ws && source /opt/ros/$ROS_DISTRO/setup.sh && catkin build
+
 
 RUN source /opt/ros/$ROS_DISTRO/setup.sh && cd $HOME/catkin_ws  && rosdep install --from-paths src --ignore-src -y \
 && sudo ./src/mavros/mavros/scripts/install_geographiclib_datasets.sh \
